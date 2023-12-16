@@ -5,4 +5,6 @@ using UnityEngine;
 public class C_Weapon : I_Component
 {
     public float dmg;
+    public float cooldown;
+    public int hitCount;
 }

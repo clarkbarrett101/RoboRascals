@@ -6,16 +6,16 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    public I_Actor actor;
+    public A_Robot actor;
     Vector2 move;
     public float maxAccel = 1.5f;
     public float turnSpeed = 10;
     float locktimer = 0;
-    public Animator drillA;
-    public Animator drillB;
+    public Animator weaponAnimA;
+    public Animator weaponAnimB;
     void Start()
     {
-        actor = GetComponent<I_Actor>();
+        actor = GetComponent<A_Robot>();
     }
 
     // Update is called once per frame
@@ -54,7 +54,7 @@ public class PlayerController : MonoBehaviour
         if(locktimer <= 0)
         {
             actor.anim.SetTrigger("RAttack");
-            drillA.SetTrigger("Attack");
+            weaponAnimA.SetTrigger("Attack");
         }
     }
     public void OnAttackB()
@@ -62,7 +62,7 @@ public class PlayerController : MonoBehaviour
         if (locktimer <= 0)
         {
             actor.anim.SetTrigger("LAttack");
-            drillB.SetTrigger("Attack");
+            weaponAnimB.SetTrigger("Attack");
         }
     }
     public void SpinLock()
