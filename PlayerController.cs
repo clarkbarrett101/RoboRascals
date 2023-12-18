@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour
         }
         else if(move.magnitude > 0)
         {
+            actor.anim.SetBool("Walking", true);
             transform.position += new Vector3(move.x, 0, move.y) * (actor.moveAccel * actor.moveSpeed * Time.deltaTime);
             if(actor.moveAccel <= maxAccel)
             {
@@ -41,6 +42,7 @@ public class PlayerController : MonoBehaviour
             transform.eulerAngles += new Vector3(0,lookDiff,0) * (Time.deltaTime * turnSpeed);
         }else
         {
+            actor.anim.SetBool("Walking", false);
             actor.moveAccel = 1;
         }
     }

@@ -20,4 +20,9 @@ public class I_Actor : MonoBehaviour
     {
         chp -= dmg;
     }
+
+    public virtual void Die()
+    {
+
+    }
 }
