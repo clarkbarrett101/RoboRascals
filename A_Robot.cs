@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class A_Robot : I_Actor
 {
@@ -11,6 +13,18 @@ public class A_Robot : I_Actor
     GameObject leftWeapon;
     public C_Weapon leftCWeapon;
     public Transform leftHand;
+    public float rcooldown;
+    public float lcooldown;
+    float hurtTimer = 0;
+    public Image hpMeter;
+    Color mainColor;
+
+    public override void Awake()
+    {
+        base.Awake();
+        mainColor = hpMeter.color;
+        playerController = GetComponent<PlayerController>();
+    }
     void Start()
     {
         rightCWeapon = StaticVariables.weapons[0];
@@ -23,6 +37,45 @@ public class A_Robot : I_Actor
         leftWeapon.GetComponent<Weapon>().owner = this;
         playerController.weaponAnimA = rightWeapon.GetComponent<Animator>();
         playerController.weaponAnimB = leftWeapon.GetComponent<Animator>();
+
     }
 
+    private void Update()
+    {
+        base.Update();
+        if(rcooldown > 0)
+        {
+            rcooldown -= Time.deltaTime;
+        }
+        if(lcooldown > 0)
+        {
+            lcooldown -= Time.deltaTime;
+        }
+        if(hurtTimer > 0)
+        {
+            hurtTimer -= Time.deltaTime;
+            hpMeter.color = Color.Lerp(Color.yellow, mainColor, hurtTimer);
+        }else
+        {
+            hpMeter.color = mainColor;
+        }
+        hpMeter.fillAmount = chp / mhp;
+    }
+
+    public override void ApplyDamage(I_Actor attacker, float dmg)
+    {
+        base.ApplyDamage(attacker, dmg);
+        hurtTimer = .5f;
+        Destroy(Instantiate(sparks,transform.position+Vector3.up,Quaternion.LookRotation(attacker.transform.forward)),2);
+        anim.SetTrigger("Hit");
+        playerController.SpinLock();
+        if(chp <= 0)
+        {
+            Die();
+        }
+    }
+    void Die()
+    {
+        Destroy(gameObject);
+    }
 }

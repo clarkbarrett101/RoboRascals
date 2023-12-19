@@ -12,6 +12,8 @@ public class Weapon : MonoBehaviour
    {
       hitBox = GetComponentInChildren<HitBox>();
       hitBox.dmg = component.dmg/ component.hitCount;
+      hitBox.hitPush = component.hitPush/ component.hitCount;
+      hitBox.recoil = component.recoil/ component.hitCount;
       hitBox.attacker = owner;
    }
 }

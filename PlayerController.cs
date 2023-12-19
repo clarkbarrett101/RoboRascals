@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
     public float maxAccel = 1.5f;
     public float turnSpeed = 10;
     float locktimer = 0;
+    float attackLock = 0;
     public Animator weaponAnimA;
     public Animator weaponAnimB;
     void Start()
@@ -21,6 +22,10 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(attackLock > 0)
+        {
+            attackLock -= Time.deltaTime;
+        }
         if (locktimer > 0)
         {
             locktimer -= Time.deltaTime;
@@ -53,18 +58,30 @@ public class PlayerController : MonoBehaviour
     }
     public void OnAttackA()
     {
-        if(locktimer <= 0)
+        if(actor.rcooldown > 0)
         {
+            return;
+        }
+        if(locktimer <= 0 && attackLock <= 0)
+        {
+            attackLock = 1.5f;
             actor.anim.SetTrigger("RAttack");
             weaponAnimA.SetTrigger("Attack");
+            actor.rcooldown = actor.rightCWeapon.cooldown;
         }
     }
     public void OnAttackB()
     {
-        if (locktimer <= 0)
+        if (actor.lcooldown > 0)
         {
+            return;
+        }
+        if (locktimer <= 0 && attackLock <= 0)
+        {
+            attackLock = 1.5f;
             actor.anim.SetTrigger("LAttack");
             weaponAnimB.SetTrigger("Attack");
+            actor.lcooldown = actor.leftCWeapon.cooldown;
         }
     }
     public void SpinLock()

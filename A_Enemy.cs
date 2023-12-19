@@ -8,7 +8,6 @@ public class A_Enemy : I_Actor
 {
     public List<GameObject> bits = new List<GameObject>(16);
     public GameObject bitPrefab;
-    public GameObject sparks;
     public float bitSpeed;
     public GameObject explosion;
     public StateMachine state;
@@ -26,6 +25,9 @@ public class A_Enemy : I_Actor
         hitBox.attacker = this;
         hitBox.dmg = stats.attackDamage;
         players.AddRange(FindObjectsOfType<A_Robot>());
+        ScoreBoard.enemies.Add(this);
+        hitBox.hitPush = stats.attackPush;
+        hitBox.recoil = stats.attackRecoil;
     }
 
     public enum StateMachine
@@ -41,13 +43,21 @@ public class A_Enemy : I_Actor
         hitstun = .5f;
         anim.SetTrigger("Hit");
         Vector3 hitDir = transform.position - attacker.transform.position;
-        Instantiate(sparks,transform.position,Quaternion.LookRotation(hitDir));
-        while(bits.Count>(chp/mhp)*bits.Capacity)
+        Destroy(Instantiate(sparks,transform.position+Vector3.up,Quaternion.LookRotation(hitDir)),2);
+        try
         {
-            int bit = Random.Range(0, bits.Count);
-            ShootBit(bits[bit],hitDir);
-            bits.Remove(bits[bit]);
+            while (bits.Count > (chp / mhp) * bits.Capacity)
+            {
+                int bit = Random.Range(0, bits.Count);
+                ShootBit(bits[bit], hitDir);
+                bits.Remove(bits[bit]);
+            }
         }
+        catch (Exception e)
+        {
+            Debug.Log(e);
+        }
+
         if (chp <= 0)
         {
             Die();
@@ -56,19 +66,28 @@ public class A_Enemy : I_Actor
     void ShootBit(GameObject bit,Vector3 dir)
     {
         bit.SetActive(false);
-        Vector3 newdir = new Vector3(dir.x*Random.value,1,dir.z*Random.value);
-        GameObject newbit = Instantiate(bitPrefab,transform.position,Quaternion.identity);
+        Vector3 newdir = new Vector3(dir.x*Random.value,.1f,dir.z*Random.value);
+        GameObject newbit = Instantiate(bitPrefab,transform.position,Random.rotation);
         newbit.GetComponent<Rigidbody>().AddForce(newdir*bitSpeed);
         Destroy(newbit,2);
     }
     public override void Die()
     {
-       Destroy( Instantiate(explosion,transform.position,Quaternion.identity),1);
+        Destroy(Instantiate(explosion, transform.position, Quaternion.identity), 1);
+       ScoreBoard.enemies.Remove(this);
         Destroy(gameObject);
     }
 
     private void Update()
     {
+        base.Update();
+        foreach(RaycastHit hit in Physics.SphereCastAll(transform.position,1,transform.forward,1))
+        {
+            if(hit.collider.gameObject != gameObject && hit.collider.gameObject.tag == gameObject.tag)
+            {
+                transform.position += (transform.position - hit.collider.transform.position).normalized * (moveSpeed * Time.deltaTime);
+            }
+        }
         if(hitstun > 0)
         {
             hitstun -= Time.deltaTime;
@@ -138,5 +157,11 @@ public class A_Enemy : I_Actor
             }
         }
         return closest;
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        Debug.Log("Collision");
+        transform.position += (transform.position - collision.transform.position).normalized * (moveSpeed * Time.deltaTime);
     }
 }

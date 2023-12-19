@@ -7,4 +7,7 @@ public class C_Weapon : I_Component
     public float dmg;
     public float cooldown;
     public int hitCount;
+    public float hitPush;
+    public float recoil;
+    public float momentum;
 }

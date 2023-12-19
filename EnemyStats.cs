@@ -9,4 +9,6 @@ public class EnemyStats : ScriptableObject
     public float moveSpeed;
     public float attackRange;
     public float attackCooldown;
+    public float attackPush;
+    public float attackRecoil;
 }
