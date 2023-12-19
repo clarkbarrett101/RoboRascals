@@ -78,7 +78,7 @@ public class A_Enemy : I_Actor
         Destroy(gameObject);
     }
 
-    private void Update()
+    public override void Update()
     {
         base.Update();
         foreach(RaycastHit hit in Physics.SphereCastAll(transform.position,1,transform.forward,1))

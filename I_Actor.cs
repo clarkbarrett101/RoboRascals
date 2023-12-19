@@ -37,13 +37,15 @@ public class I_Actor : MonoBehaviour
     }
     public virtual void Update()
     {
+        if(push.magnitude > .1f)
+             {
         Vector3 pushMod = new Vector3(push.x*2, 0, push.y*2)*Time.deltaTime;
         transform.position += pushMod;
         push = new Vector2(push.x-pushMod.x, push.y-pushMod.z);
-        if(push.magnitude < .1f)
-        {
-            push = Vector2.zero;
-        }
+             }else
+             {
+                 push = Vector2.zero;
+             }
         foreach(I_StatusEffect effect in statusEffects)
         {
             effect.UpdateEffect(this);
@@ -62,6 +64,11 @@ public class I_Actor : MonoBehaviour
     }
 
     public virtual void Die()
+    {
+
+    }
+
+    public virtual void OnHit(I_Actor target)
     {
 
     }

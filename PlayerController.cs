@@ -68,6 +68,8 @@ public class PlayerController : MonoBehaviour
             actor.anim.SetTrigger("RAttack");
             weaponAnimA.SetTrigger("Attack");
             actor.rcooldown = actor.rightCWeapon.cooldown;
+            actor.attackingRight = true;
+            actor.rightCWeapon.Anticipation(actor);
         }
     }
     public void OnAttackB()
@@ -82,10 +84,22 @@ public class PlayerController : MonoBehaviour
             actor.anim.SetTrigger("LAttack");
             weaponAnimB.SetTrigger("Attack");
             actor.lcooldown = actor.leftCWeapon.cooldown;
+            actor.attackingRight = false;
+            actor.leftCWeapon.Anticipation(actor);
         }
     }
     public void SpinLock()
     {
         locktimer = 0.5f;
+    }
+    public void AttackAction()
+    {
+        if(actor.attackingRight)
+        {
+            actor.rightCWeapon.Action(actor);
+        }else
+        {
+            actor.leftCWeapon.Action(actor);
+        }
     }
 }

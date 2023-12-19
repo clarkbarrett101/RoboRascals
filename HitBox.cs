@@ -22,6 +22,7 @@ public class HitBox : MonoBehaviour
             Vector2 rv = new Vector2(attacker.transform.forward.x, attacker.transform.forward.z);
             actor.PushActor( rv * hitPush);
             attacker.PushActor( rv * recoil);
+            attacker.OnHit(actor);
         }
     }
 }

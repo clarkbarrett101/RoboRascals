@@ -18,6 +18,7 @@ public class A_Robot : I_Actor
     float hurtTimer = 0;
     public Image hpMeter;
     Color mainColor;
+    public bool attackingRight = false;
 
     public override void Awake()
     {
@@ -77,5 +78,17 @@ public class A_Robot : I_Actor
     void Die()
     {
         Destroy(gameObject);
+    }
+
+    public override void OnHit(I_Actor target)
+    {
+        base.OnHit(target);
+        if (attackingRight)
+        {
+            rightCWeapon.OnHit(target);
+        }else
+        {
+            leftCWeapon.OnHit(target);
+        }
     }
 }
