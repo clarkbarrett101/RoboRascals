@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class A_Robot : I_Actor
 {
+    public float hpRegen;
     PlayerController playerController;
     GameObject rightWeapon;
     public C_Weapon rightCWeapon;
@@ -19,7 +20,8 @@ public class A_Robot : I_Actor
     public Image hpMeter;
     Color mainColor;
     public bool attackingRight = false;
-
+    public GameObject[] cooldownMetersR;
+    public GameObject[] cooldownMetersL;
     public override void Awake()
     {
         base.Awake();
@@ -44,13 +46,67 @@ public class A_Robot : I_Actor
     private void Update()
     {
         base.Update();
+        if(chp < mhp)
+        {
+            chp += hpRegen * Time.deltaTime*(mhp-chp)/mhp;
+        }else
+        {
+            chp = mhp;
+        }
         if(rcooldown > 0)
         {
             rcooldown -= Time.deltaTime;
+            if(rcooldown < rightCWeapon.cooldown*.3f)
+            {
+                cooldownMetersR[0].SetActive(true);
+                cooldownMetersR[1].SetActive(false);
+                cooldownMetersR[2].SetActive(false);
+            }
+            else if(rcooldown < rightCWeapon.cooldown*.7f)
+            {
+                cooldownMetersR[0].SetActive(false);
+                cooldownMetersR[1].SetActive(true);
+                cooldownMetersR[2].SetActive(false);
+            }else
+            {
+                cooldownMetersR[0].SetActive(false);
+                cooldownMetersR[1].SetActive(false);
+                cooldownMetersR[2].SetActive(false);
+            }
+        }
+        else
+        {
+            cooldownMetersR[0].SetActive(false);
+            cooldownMetersR[1].SetActive(false);
+            cooldownMetersR[2].SetActive(true);
         }
         if(lcooldown > 0)
         {
             lcooldown -= Time.deltaTime;
+            if(lcooldown < leftCWeapon.cooldown*.3f)
+            {
+                cooldownMetersL[0].SetActive(true);
+                cooldownMetersL[1].SetActive(false);
+                cooldownMetersL[2].SetActive(false);
+            }
+            else if(lcooldown < leftCWeapon.cooldown*.7f)
+            {
+                cooldownMetersL[0].SetActive(false);
+                cooldownMetersL[1].SetActive(true);
+                cooldownMetersL[2].SetActive(false);
+            }
+            else
+            {
+                cooldownMetersL[0].SetActive(false);
+                cooldownMetersL[1].SetActive(false);
+                cooldownMetersL[2].SetActive(false);
+            }
+        }
+        else
+        {
+            cooldownMetersL[0].SetActive(false);
+            cooldownMetersL[1].SetActive(false);
+            cooldownMetersL[2].SetActive(true);
         }
         if(hurtTimer > 0)
         {

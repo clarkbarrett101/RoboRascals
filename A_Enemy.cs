@@ -17,6 +17,7 @@ public class A_Enemy : I_Actor
     float hitstun;
     float cooldown;
     public HitBox hitBox;
+    public float tazerTime;
     private void Start()
     {
         mhp = stats.mhp;
@@ -91,8 +92,14 @@ public class A_Enemy : I_Actor
         if(hitstun > 0)
         {
             hitstun -= Time.deltaTime;
+            if(tazerTime > 0)
+            {
+                tazerTime -= Time.deltaTime;
+                return;
+            }
             return;
         }
+
         closestPlayer = FindClosestPlayer();
         switch (state)
         {
