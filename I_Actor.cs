@@ -13,7 +13,10 @@ public class I_Actor : MonoBehaviour
     public GameObject sparks;
     public List<I_StatusEffect> statusEffects = new List<I_StatusEffect>();
     public List<GameObject> effectPawns = new List<GameObject>();
-    public Vector2 push;
+    public Vector3 push;
+    public float attackLock;
+    public float moveLock;
+
     public virtual void Awake()
     {
         anim = anim ? anim : GetComponent<Animator>();
@@ -23,9 +26,10 @@ public class I_Actor : MonoBehaviour
     {
         chp -= dmg;
     }
+
     public virtual void ApplyStatusEffect(I_StatusEffect effect)
     {
-        if(statusEffects.Contains(effect))
+        if (statusEffects.Contains(effect))
         {
             statusEffects.Find(x => x.name == effect.name).duration = effect.duration;
             return;
@@ -35,41 +39,57 @@ public class I_Actor : MonoBehaviour
         effect.ApplyEffect(this);
         statusEffects.Add(effect);
     }
+
     public virtual void Update()
     {
-        if(push.magnitude > .1f)
-             {
-        Vector3 pushMod = new Vector3(push.x*2, 0, push.y*2)*Time.deltaTime;
-        transform.position += pushMod;
-        push = new Vector2(push.x-pushMod.x, push.y-pushMod.z);
-             }else
-             {
-                 push = Vector2.zero;
-             }
-        foreach(I_StatusEffect effect in statusEffects)
+        if(moveLock > 0)
+            moveLock -= Time.deltaTime;
+        if(attackLock > 0)
+            attackLock -= Time.deltaTime;
+        if (push.magnitude > .1f)
+        {
+            Vector3 pushMod = new Vector3(push.x * 2, 0, push.z * 2) * Time.deltaTime;
+            transform.position += pushMod;
+            push = new Vector3(push.x - pushMod.x, 0, push.z - pushMod.z);
+        }
+        else
+        {
+            push = Vector3.zero;
+        }
+
+        foreach (I_StatusEffect effect in statusEffects)
         {
             effect.UpdateEffect(this);
             effect.duration -= Time.deltaTime;
-            if(effect.duration <= 0)
+            if (effect.duration <= 0)
             {
                 effect.RemoveEffect(this);
-                effectPawns.RemoveAt( statusEffects.FindIndex(x => x.name == effect.name));
+                effectPawns.RemoveAt(statusEffects.FindIndex(x => x.name == effect.name));
                 statusEffects.Remove(effect);
             }
         }
     }
-    public void PushActor(Vector2 direction)
+
+    public void PushActor(Vector3 direction)
     {
         push += direction;
     }
 
     public virtual void Die()
     {
-
     }
 
     public virtual void OnHit(I_Actor target)
     {
-
+    }
+    public void AttackLock(float time)
+    {
+        if(attackLock < time)
+            attackLock = time;
+    }
+    public void MoveLock(float time)
+    {
+        if(moveLock < time)
+            moveLock = time;
     }
 }

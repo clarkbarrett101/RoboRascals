@@ -14,14 +14,25 @@ public class A_Robot : I_Actor
     GameObject leftWeapon;
     public C_Weapon leftCWeapon;
     public Transform leftHand;
+    public C_Weapon cGun;
+    public Transform gunHand;
+    public GameObject gunObj;
     public float rcooldown;
     public float lcooldown;
+    public float gcooldown;
     float hurtTimer = 0;
     public Image hpMeter;
     Color mainColor;
-    public bool attackingRight = false;
+    public AttackType attackType;
     public GameObject[] cooldownMetersR;
     public GameObject[] cooldownMetersL;
+
+    public enum AttackType
+    {
+        Right,
+        Left,
+        Gun
+    }
     public override void Awake()
     {
         base.Awake();
@@ -32,15 +43,18 @@ public class A_Robot : I_Actor
     {
         rightCWeapon = StaticVariables.weapons[0];
         leftCWeapon = StaticVariables.weapons[1];
+       // cGun = StaticVariables.weapons[2];
         playerController = GetComponent<PlayerController>();
         rightWeapon = Instantiate(rightCWeapon.prefab, rightHand);
         rightWeapon.transform.localScale = new Vector3(rightWeapon.transform.localScale.x, rightWeapon.transform.localScale.y*-1, rightWeapon.transform.localScale.z);
         leftWeapon = Instantiate(leftCWeapon.prefab, leftHand);
+        gunObj = Instantiate(cGun.prefab, gunHand);
         rightWeapon.GetComponent<Weapon>().owner = this;
         leftWeapon.GetComponent<Weapon>().owner = this;
+        gunObj.GetComponent<Weapon>().owner = this;
         playerController.weaponAnimA = rightWeapon.GetComponent<Animator>();
         playerController.weaponAnimB = leftWeapon.GetComponent<Animator>();
-
+        playerController.weaponAnimC = gunObj.GetComponent<Animator>();
     }
 
     private void Update()
@@ -52,6 +66,10 @@ public class A_Robot : I_Actor
         }else
         {
             chp = mhp;
+        }
+        if(gcooldown> 0)
+        {
+            gcooldown -= Time.deltaTime;
         }
         if(rcooldown > 0)
         {
@@ -139,12 +157,17 @@ public class A_Robot : I_Actor
     public override void OnHit(I_Actor target)
     {
         base.OnHit(target);
-        if (attackingRight)
+        switch (attackType)
         {
-            rightCWeapon.OnHit(target);
-        }else
-        {
-            leftCWeapon.OnHit(target);
+            case AttackType.Right:
+                rightCWeapon.OnHit(target);
+                break;
+            case AttackType.Left:
+                leftCWeapon.OnHit(target);
+                break;
+            case AttackType.Gun:
+                cGun.OnHit(target);
+                break;
         }
     }
 }

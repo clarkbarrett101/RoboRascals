@@ -9,7 +9,7 @@ public class HitBox : MonoBehaviour
     public I_Actor attacker;
     public float hitPush;
     public float recoil;
-    private void OnTriggerEnter(Collider collision)
+    public void OnTriggerEnter(Collider collision)
     {
         Debug.Log("Hit");
         if (collision.gameObject.tag == tag)
@@ -19,9 +19,8 @@ public class HitBox : MonoBehaviour
         if (collision.gameObject.TryGetComponent<I_Actor>(out I_Actor actor))
         {
             actor.ApplyDamage(attacker, dmg);
-            Vector2 rv = new Vector2(attacker.transform.forward.x, attacker.transform.forward.z);
-            actor.PushActor( rv * hitPush);
-            attacker.PushActor( rv * recoil);
+            actor.PushActor( attacker.transform.forward * hitPush);
+            attacker.PushActor( attacker.transform.forward * recoil);
             attacker.OnHit(actor);
         }
     }

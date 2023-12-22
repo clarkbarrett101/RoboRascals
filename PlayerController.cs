@@ -10,10 +10,12 @@ public class PlayerController : MonoBehaviour
     Vector2 move;
     public float maxAccel = 1.5f;
     public float turnSpeed = 10;
-    float locktimer = 0;
-    float attackLock = 0;
     public Animator weaponAnimA;
     public Animator weaponAnimB;
+    public Animator weaponAnimC;
+    public float jetCooldown = 1;
+    public float jetTimer = 0;
+    public float jetForce = 1;
     void Start()
     {
         actor = GetComponent<A_Robot>();
@@ -22,33 +24,34 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(attackLock > 0)
+        if(jetTimer > 0)
+            jetTimer -= Time.deltaTime;
+        if (actor.moveLock <= 0)
         {
-            attackLock -= Time.deltaTime;
-        }
-        if (locktimer > 0)
-        {
-            locktimer -= Time.deltaTime;
-        }
-        else if(move.magnitude > 0)
-        {
-            actor.anim.SetBool("Walking", true);
-            transform.position += new Vector3(move.x, 0, move.y) * (actor.moveAccel * actor.moveSpeed * Time.deltaTime);
-            if(actor.moveAccel <= maxAccel)
+            if (move.magnitude > 0)
             {
-               actor.moveAccel += Time.deltaTime;
+                actor.anim.SetBool("Walking", true);
+                transform.position += new Vector3(move.x, 0, move.y) *
+                                      (actor.moveAccel * actor.moveSpeed * Time.deltaTime);
+                if (actor.moveAccel <= maxAccel)
+                {
+                    actor.moveAccel += Time.deltaTime;
+                }
+
+                Vector3 lookDir = Quaternion.LookRotation(new Vector3(move.x, 0, move.y)).eulerAngles;
+                float lookDiff = lookDir.y - transform.eulerAngles.y;
+                if (lookDiff > 180)
+                {
+                    lookDiff -= 360;
+                }
+
+                transform.eulerAngles += new Vector3(0, lookDiff, 0) * (Time.deltaTime * turnSpeed);
             }
-            Vector3 lookDir = Quaternion.LookRotation(new Vector3(move.x, 0, move.y)).eulerAngles;
-            float lookDiff = lookDir.y - transform.eulerAngles.y;
-            if(lookDiff > 180)
+            else
             {
-                lookDiff -= 360;
+                actor.anim.SetBool("Walking", false);
+                actor.moveAccel = 1;
             }
-            transform.eulerAngles += new Vector3(0,lookDiff,0) * (Time.deltaTime * turnSpeed);
-        }else
-        {
-            actor.anim.SetBool("Walking", false);
-            actor.moveAccel = 1;
         }
     }
 
@@ -62,13 +65,13 @@ public class PlayerController : MonoBehaviour
         {
             return;
         }
-        if(locktimer <= 0 && attackLock <= 0)
+        if(actor.moveLock <= 0 && actor.attackLock <= 0)
         {
-            attackLock = 1.5f;
+            actor.AttackLock(1.5f);
             actor.anim.SetTrigger("RAttack");
             weaponAnimA.SetTrigger("Attack");
             actor.rcooldown = actor.rightCWeapon.cooldown;
-            actor.attackingRight = true;
+            actor.attackType = A_Robot.AttackType.Right;
             actor.rightCWeapon.Anticipation(actor);
         }
     }
@@ -78,28 +81,59 @@ public class PlayerController : MonoBehaviour
         {
             return;
         }
-        if (locktimer <= 0 && attackLock <= 0)
+        if (actor.moveLock <= 0 && actor.attackLock <= 0)
         {
-            attackLock = 1.5f;
+            actor.AttackLock(1.5f);
             actor.anim.SetTrigger("LAttack");
             weaponAnimB.SetTrigger("Attack");
             actor.lcooldown = actor.leftCWeapon.cooldown;
-            actor.attackingRight = false;
+            actor.attackType = A_Robot.AttackType.Left;
             actor.leftCWeapon.Anticipation(actor);
         }
     }
     public void SpinLock()
     {
-        locktimer = 0.5f;
+        actor.MoveLock(.5f);
     }
     public void AttackAction()
     {
-        if(actor.attackingRight)
+        switch (actor.attackType)
         {
-            actor.rightCWeapon.Action(actor);
-        }else
+            case A_Robot.AttackType.Right:
+                actor.rightCWeapon.Action(actor);
+                break;
+            case A_Robot.AttackType.Left:
+                actor.leftCWeapon.Action(actor);
+                break;
+            case A_Robot.AttackType.Gun:
+                actor.cGun.Action(actor);
+                break;
+        }
+    }
+    public void OnJet()
+    {
+        if(jetTimer > 0 || actor.moveLock > 0 || actor.attackLock > 0)
         {
-            actor.leftCWeapon.Action(actor);
+            return;
+        }
+        jetTimer = jetCooldown;
+        actor.anim.SetTrigger("Jet");
+        actor.PushActor(transform.forward * jetForce);
+    }
+    public void OnAttackC()
+    {
+        if (actor.gcooldown > 0)
+        {
+            return;
+        }
+        if (actor.moveLock <= 0 && actor.attackLock <= 0)
+        {
+            actor.AttackLock(1.5f);
+            actor.anim.SetTrigger("Shoot");
+            weaponAnimC.SetTrigger("Attack");
+            actor.gcooldown = actor.cGun.cooldown;
+            actor.attackType = A_Robot.AttackType.Gun;
+            actor.cGun.Anticipation(actor);
         }
     }
 }

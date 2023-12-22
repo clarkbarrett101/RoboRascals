@@ -14,7 +14,6 @@ public class A_Enemy : I_Actor
     public EnemyStats stats;
     List<A_Robot> players = new List<A_Robot>();
     A_Robot closestPlayer;
-    float hitstun;
     float cooldown;
     public HitBox hitBox;
     public float tazerTime;
@@ -41,7 +40,7 @@ public class A_Enemy : I_Actor
     public override void ApplyDamage(I_Actor attacker, float dmg)
     {
         base.ApplyDamage(attacker, dmg);
-        hitstun = .5f;
+        MoveLock(.5f);
         anim.SetTrigger("Hit");
         Vector3 hitDir = transform.position - attacker.transform.position;
         Destroy(Instantiate(sparks,transform.position+Vector3.up,Quaternion.LookRotation(hitDir)),2);
@@ -69,7 +68,8 @@ public class A_Enemy : I_Actor
         bit.SetActive(false);
         Vector3 newdir = new Vector3(dir.x*Random.value,.1f,dir.z*Random.value);
         GameObject newbit = Instantiate(bitPrefab,transform.position,Random.rotation);
-        newbit.GetComponent<Rigidbody>().AddForce(newdir*bitSpeed);
+        newbit.GetComponent<Rigidbody>().AddForce(newdir*(bitSpeed*Random.Range(.5f,1.5f)));
+        newbit.transform.localScale *= Random.Range(.5f,1.5f);
         Destroy(newbit,2);
     }
     public override void Die()
@@ -89,16 +89,8 @@ public class A_Enemy : I_Actor
                 transform.position += (transform.position - hit.collider.transform.position).normalized * (moveSpeed * Time.deltaTime);
             }
         }
-        if(hitstun > 0)
-        {
-            hitstun -= Time.deltaTime;
-            if(tazerTime > 0)
-            {
-                tazerTime -= Time.deltaTime;
-                return;
-            }
+        if(moveLock > 0)
             return;
-        }
 
         closestPlayer = FindClosestPlayer();
         switch (state)
