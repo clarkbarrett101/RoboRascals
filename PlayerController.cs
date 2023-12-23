@@ -19,6 +19,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         actor = GetComponent<A_Robot>();
+        CamManager.players.Add(transform);
     }
 
     // Update is called once per frame
@@ -31,6 +32,8 @@ public class PlayerController : MonoBehaviour
             if (move.magnitude > 0)
             {
                 actor.anim.SetBool("Walking", true);
+
+
                 transform.position += new Vector3(move.x, 0, move.y) *
                                       (actor.moveAccel * actor.moveSpeed * Time.deltaTime);
                 if (actor.moveAccel <= maxAccel)
@@ -67,7 +70,7 @@ public class PlayerController : MonoBehaviour
         }
         if(actor.moveLock <= 0 && actor.attackLock <= 0)
         {
-            actor.AttackLock(1.5f);
+            actor.AttackLock(1);
             actor.anim.SetTrigger("RAttack");
             weaponAnimA.SetTrigger("Attack");
             actor.rcooldown = actor.rightCWeapon.cooldown;
@@ -83,7 +86,7 @@ public class PlayerController : MonoBehaviour
         }
         if (actor.moveLock <= 0 && actor.attackLock <= 0)
         {
-            actor.AttackLock(1.5f);
+            actor.AttackLock(1);
             actor.anim.SetTrigger("LAttack");
             weaponAnimB.SetTrigger("Attack");
             actor.lcooldown = actor.leftCWeapon.cooldown;
@@ -135,5 +138,10 @@ public class PlayerController : MonoBehaviour
             actor.attackType = A_Robot.AttackType.Gun;
             actor.cGun.Anticipation(actor);
         }
+    }
+
+    public void OnStart()
+    {
+
     }
 }

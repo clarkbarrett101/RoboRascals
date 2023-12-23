@@ -4,18 +4,21 @@ using UnityEngine;
 
 public class ScoreBoard : MonoBehaviour
 {
-   public static List<A_Enemy> enemies = new List<A_Enemy>();
-   int level = 1;
+   public  List<A_Enemy> enemies = new List<A_Enemy>();
+   public List<A_Enemy> awakeEnemies = new List<A_Enemy>();
    public GameObject spider;
+   public float heatLevel = 2;
+   public float heatLevelMax = 10;
+   public float heatProgress = 0;
    public void Update()
    {
-      if(enemies.Count == 0)
+      if(awakeEnemies.Count < heatLevel)
       {
-         level++;
-         for (int i = 0; i < level; i++)
-         {
-            Instantiate(spider, new Vector3(Random.Range(-10, 10), 0, Random.Range(-10, 10)), Quaternion.identity);
-         }
+         if(heatLevel<heatLevelMax)
+            heatLevel += heatProgress;
+         awakeEnemies.Add(enemies[0]);
+         enemies[0].idling = false;
+         enemies.Remove(enemies[0]);
       }
    }
 }

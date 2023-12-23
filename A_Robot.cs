@@ -48,13 +48,13 @@ public class A_Robot : I_Actor
         rightWeapon = Instantiate(rightCWeapon.prefab, rightHand);
         rightWeapon.transform.localScale = new Vector3(rightWeapon.transform.localScale.x, rightWeapon.transform.localScale.y*-1, rightWeapon.transform.localScale.z);
         leftWeapon = Instantiate(leftCWeapon.prefab, leftHand);
-        gunObj = Instantiate(cGun.prefab, gunHand);
+       // gunObj = Instantiate(cGun.prefab, gunHand);
         rightWeapon.GetComponent<Weapon>().owner = this;
         leftWeapon.GetComponent<Weapon>().owner = this;
-        gunObj.GetComponent<Weapon>().owner = this;
+      //  gunObj.GetComponent<Weapon>().owner = this;
         playerController.weaponAnimA = rightWeapon.GetComponent<Animator>();
         playerController.weaponAnimB = leftWeapon.GetComponent<Animator>();
-        playerController.weaponAnimC = gunObj.GetComponent<Animator>();
+      //  playerController.weaponAnimC = gunObj.GetComponent<Animator>();
     }
 
     private void Update()

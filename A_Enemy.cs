@@ -16,7 +16,10 @@ public class A_Enemy : I_Actor
     A_Robot closestPlayer;
     float cooldown;
     public HitBox hitBox;
+    public bool idling = true;
     public float tazerTime;
+    public float aggroRange;
+    AudioSource audioSource;
     private void Start()
     {
         mhp = stats.mhp;
@@ -25,9 +28,9 @@ public class A_Enemy : I_Actor
         hitBox.attacker = this;
         hitBox.dmg = stats.attackDamage;
         players.AddRange(FindObjectsOfType<A_Robot>());
-        ScoreBoard.enemies.Add(this);
         hitBox.hitPush = stats.attackPush;
         hitBox.recoil = stats.attackRecoil;
+        audioSource = GetComponent<AudioSource>();
     }
 
     public enum StateMachine
@@ -74,8 +77,8 @@ public class A_Enemy : I_Actor
     }
     public override void Die()
     {
+        FindObjectOfType<ScoreBoard>().awakeEnemies.Remove(this);
         Destroy(Instantiate(explosion, transform.position, Quaternion.identity), 1);
-       ScoreBoard.enemies.Remove(this);
         Destroy(gameObject);
     }
 
@@ -112,7 +115,17 @@ public class A_Enemy : I_Actor
     }
     void Idle()
     {
-
+        if(idling)
+            return;
+        foreach (var player in players)
+        {
+            if (Vector3.Distance(transform.position, player.transform.position) < aggroRange)
+            {
+                state = StateMachine.Move;
+                anim.SetBool("Sleep",false);
+                return;
+            }
+        }
     }
     void Attack()
     {
@@ -126,6 +139,7 @@ public class A_Enemy : I_Actor
             state = StateMachine.Move;
             return;
         }
+        audioSource.Play();
         anim.SetTrigger("Attack");
         cooldown = stats.attackCooldown;
     }

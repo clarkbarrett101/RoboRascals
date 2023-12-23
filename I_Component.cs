@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class I_Component : ScriptableObject
 {
+    public Sprite sprite;
     public GameObject prefab;
     public I_CompAction action;
 
