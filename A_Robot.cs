@@ -24,6 +24,7 @@ public class A_Robot : I_Actor
     public AttackType attackType;
     public Hero[] heroes;
     public Hero hero;
+    public bool dead;
 
     public enum AttackType
     {
@@ -157,6 +158,21 @@ public class A_Robot : I_Actor
             hero.hpMeter.color = mainColor;
         }
         hero.hpMeter.fillAmount = chp / mhp;
+        if (dead)
+        {
+            hero.hpMeter.color = Color.white;
+            chp+=hpRegen*Time.deltaTime*2;
+            if (chp > mhp / 2)
+            {
+                dead = false;
+                anim.SetBool("Dead", false);
+                foreach(A_Enemy enemy in FindObjectsOfType<A_Enemy>())
+                {
+                    enemy.players.Add(this);
+                }
+            }
+
+        }
     }
 
     public override void ApplyDamage(I_Actor attacker, float dmg)
@@ -173,7 +189,13 @@ public class A_Robot : I_Actor
     }
     void Die()
     {
-        Destroy(gameObject);
+        dead = true;
+        anim.SetBool("Dead", true);
+        anim.SetBool("Walking", false);
+        foreach(A_Enemy enemy in FindObjectsOfType<A_Enemy>())
+        {
+            enemy.players.Remove(this);
+        }
     }
 
     public override void OnHit(I_Actor target)

@@ -87,7 +87,14 @@ public class A_Enemy : I_Actor
     public override void Update()
     {
         if (players.Count == 0)
-            return;
+        {
+            anim.SetBool("Sleep", true);
+            state = StateMachine.Idle;
+        }
+        else
+        {
+            closestPlayer = FindClosestPlayer();
+        }
         base.Update();
         foreach(RaycastHit hit in Physics.SphereCastAll(transform.position,1,transform.forward,1))
         {

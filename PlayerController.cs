@@ -25,6 +25,10 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(actor.dead)
+        {
+            return;
+        }
         if(jetTimer > 0)
             jetTimer -= Time.deltaTime;
         if (actor.moveLock <= 0)
@@ -67,6 +71,10 @@ public class PlayerController : MonoBehaviour
     }
     public void OnAttackA()
     {
+        if (actor.dead)
+        {
+            return;
+        }
         if(actor.rcooldown > 0)
         {
             return;
@@ -83,6 +91,10 @@ public class PlayerController : MonoBehaviour
     }
     public void OnAttackB()
     {
+        if (actor.dead)
+        {
+            return;
+        }
         if (actor.lcooldown > 0)
         {
             return;
@@ -118,6 +130,10 @@ public class PlayerController : MonoBehaviour
     }
     public void OnJet()
     {
+        if (actor.dead)
+        {
+            return;
+        }
         if(jetTimer > 0 || actor.moveLock > 0 || actor.attackLock > 0)
         {
             return;

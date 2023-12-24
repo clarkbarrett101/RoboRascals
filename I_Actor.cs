@@ -25,6 +25,7 @@ public class I_Actor : MonoBehaviour
     public virtual void ApplyDamage(I_Actor attacker, float dmg)
     {
         chp -= dmg;
+        attacker.StartCoroutine(HitStop());
     }
 
     public virtual void ApplyStatusEffect(I_StatusEffect effect)
@@ -92,5 +93,11 @@ public class I_Actor : MonoBehaviour
     {
         if(moveLock < time)
             moveLock = time;
+    }
+    IEnumerator HitStop()
+    {
+        Time.timeScale = .25f;
+        yield return new WaitForSecondsRealtime(.1f);
+        Time.timeScale = 1;
     }
 }
