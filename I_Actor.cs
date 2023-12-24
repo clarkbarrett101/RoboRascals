@@ -49,9 +49,10 @@ public class I_Actor : MonoBehaviour
         if (push.magnitude > .1f)
         {
             Vector3 pushMod = new Vector3(push.x * 2, 0, push.z * 2) * Time.deltaTime;
-            transform.position += pushMod;
+            if(!Physics.Raycast(transform.position, pushMod, pushMod.magnitude, LayerMask.GetMask("Wall")))
+            {transform.position += pushMod;
             push = new Vector3(push.x - pushMod.x, 0, push.z - pushMod.z);
-        }
+        }}
         else
         {
             push = Vector3.zero;

@@ -16,11 +16,16 @@ public class CamManager : MonoBehaviour
     void Update()
     {
        Vector3 averagePosition = Vector3.zero;
-       foreach (Transform player in players)
+       if (players.Count > 0)
        {
-           averagePosition += player.position;
+           foreach (Transform player in players)
+           {
+               averagePosition += player.position;
+           }
+
+           averagePosition /= players.Count;
        }
-       averagePosition /= players.Count;
-        transform.position= Vector3.Lerp(transform.position , averagePosition+ offset, Time.deltaTime*moveSpeed);
+
+       transform.position= Vector3.Lerp(transform.position , averagePosition+ offset, Time.deltaTime*moveSpeed);
     }
 }

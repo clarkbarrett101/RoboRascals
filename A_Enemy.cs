@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -12,7 +13,7 @@ public class A_Enemy : I_Actor
     public GameObject explosion;
     public StateMachine state;
     public EnemyStats stats;
-    List<A_Robot> players = new List<A_Robot>();
+    public List<A_Robot> players = new List<A_Robot>();
     A_Robot closestPlayer;
     float cooldown;
     public HitBox hitBox;
@@ -40,6 +41,7 @@ public class A_Enemy : I_Actor
         Move,
         Dead
     }
+
     public override void ApplyDamage(I_Actor attacker, float dmg)
     {
         base.ApplyDamage(attacker, dmg);
@@ -84,6 +86,8 @@ public class A_Enemy : I_Actor
 
     public override void Update()
     {
+        if (players.Count == 0)
+            return;
         base.Update();
         foreach(RaycastHit hit in Physics.SphereCastAll(transform.position,1,transform.forward,1))
         {

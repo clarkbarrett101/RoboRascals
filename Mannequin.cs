@@ -14,43 +14,39 @@ public class Mannequin : MonoBehaviour
     public C_Weapon leftCWeapon;
     public Transform leftHand;
     public C_Weapon[] allWeapons;
-    Animator anim;
+    public Animator anim;
     Animator rightAnim;
     Animator leftAnim;
-    AudioSource audioSource;
+    public AudioSource audioSource;
+    public BuilderController builderController;
 
-    private void Start()
-    {
-        anim = GetComponent<Animator>();
-        audioSource = GetComponent<AudioSource>();
-    }
 
     public void SetRightWeapon(int index)
     {
         rightCWeapon = allWeapons[index];
-        Destroy(rightWeapon);
+        if(rightWeapon!=null)
+            Destroy(rightWeapon);
         rightWeapon = Instantiate(rightCWeapon.prefab, rightHand);
         rightAnim = rightWeapon.GetComponent<Animator>();
         rightWeapon.transform.localScale = new Vector3(rightWeapon.transform.localScale.x, rightWeapon.transform.localScale.y*-1, rightWeapon.transform.localScale.z);
         rightAnim.SetTrigger("Attack");
         anim.SetTrigger("RAttack");
         audioSource.Play();
+        builderController.Build();
     }
     public void SetLeftWeapon(int index)
     {
         leftCWeapon = allWeapons[index];
-        Destroy(leftWeapon);
+        if(leftWeapon!=null)
+            Destroy(leftWeapon);
         leftWeapon = Instantiate(leftCWeapon.prefab, leftHand);
         leftAnim = leftWeapon.GetComponent<Animator>();
         anim.SetTrigger("LAttack");
         leftAnim.SetTrigger("Attack");
         audioSource.Play();
+        builderController.Build();
     }
+    void SpinLock(){}
+    void AttackAction(){}
 
-    public void FinalizeLoadout()
-    {
-        StaticVariables.weapons = new C_Weapon[2];
-        StaticVariables.weapons[0] = rightCWeapon;
-        StaticVariables.weapons[1] = leftCWeapon;
-    }
 }

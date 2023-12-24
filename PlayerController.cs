@@ -33,9 +33,12 @@ public class PlayerController : MonoBehaviour
             {
                 actor.anim.SetBool("Walking", true);
 
+                Vector3 target =  new Vector3(move.x, 0, move.y)*(actor.moveAccel * actor.moveSpeed * Time.deltaTime);
+                if(!Physics.Raycast(transform.position, target, out RaycastHit hit, target.magnitude, LayerMask.GetMask("Wall")))
+                {
+                    transform.position += target;
+                }
 
-                transform.position += new Vector3(move.x, 0, move.y) *
-                                      (actor.moveAccel * actor.moveSpeed * Time.deltaTime);
                 if (actor.moveAccel <= maxAccel)
                 {
                     actor.moveAccel += Time.deltaTime;
@@ -123,7 +126,7 @@ public class PlayerController : MonoBehaviour
         actor.anim.SetTrigger("Jet");
         actor.PushActor(transform.forward * jetForce);
     }
-    public void OnAttackC()
+   /* public void OnAttackC()
     {
         if (actor.gcooldown > 0)
         {
@@ -144,4 +147,5 @@ public class PlayerController : MonoBehaviour
     {
 
     }
+    */
 }

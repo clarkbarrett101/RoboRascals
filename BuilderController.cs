@@ -8,8 +8,6 @@ using UnityEngine.SceneManagement;
 
 public class BuilderController : MonoBehaviour
 {
-    public InputActionReference leftButton;
-    public InputActionReference rightButton;
     bool leftPressed = false;
     bool rightPressed = false;
     Vector2 move;
@@ -20,27 +18,20 @@ public class BuilderController : MonoBehaviour
     private int rselection = 0;
     private int lselection = 0;
     float cooldown = 0;
+    public GameObject[] mannequins;
+    int mannequinIndex = 0;
+    public GameObject currentMannequin;
+    static int playerid = 0;
+    public static BuildData[] builds = new BuildData[2];
+    int myid = 0;
     void Start()
     {
-        leftButton.action.started += ctx =>
-        {
-            leftPressed = true;
-
-        };
-        leftButton.action.canceled += ctx =>
-        {
-            leftPressed = false;
-
-        };
-        rightButton.action.started += ctx =>
-        {
-            rightPressed = true;
-        };
-        rightButton.action.canceled += ctx =>
-        {
-            rightPressed = false;
-
-        };
+        myid = playerid;
+        transform.parent.position += playerid * Vector3.left * 15;
+        playerid++;
+        mannequin.builderController = this;
+        mannequin.SetLeftWeapon(0);
+        mannequin.SetRightWeapon(0);
     }
 
 
@@ -114,6 +105,18 @@ public class BuilderController : MonoBehaviour
             }
         }
     }
+    public void OnAttackA()
+    {
+        leftPressed = !leftPressed;
+        if(rightPressed)
+            rightPressed = false;
+    }
+    public void OnAttackB()
+    {
+        rightPressed = !rightPressed;
+        if(leftPressed)
+            leftPressed = false;
+    }
     void OnMove(InputValue value)
     {
         if(cooldown > 0)
@@ -124,7 +127,62 @@ public class BuilderController : MonoBehaviour
     }
     public void OnStart()
     {
-        mannequin.FinalizeLoadout();
+        Build();
         SceneManager.LoadScene(1);
     }
+    public void Build()
+    {
+        BuildData buildData = new BuildData();
+        buildData.leftWeapon = mannequin.leftCWeapon;
+        buildData.rightWeapon = mannequin.rightCWeapon;
+        buildData.hero = mannequinIndex;
+        PlayerInput p = GetComponent<PlayerInput>();
+        buildData.device = p.devices[0];
+        builds[myid] = buildData;
+    }
+
+    void OnCycleDown()
+    {
+        Destroy(currentMannequin);
+        if(mannequinIndex>0)
+        {
+            mannequinIndex--;
+        }
+        else
+        {
+            mannequinIndex = mannequins.Length - 1;
+        }
+        currentMannequin = Instantiate(mannequins[mannequinIndex],transform);
+        mannequin = currentMannequin.GetComponent<Mannequin>();
+        mannequin.builderController = this;
+        mannequin.SetLeftWeapon(lselection);
+        mannequin.SetRightWeapon(rselection);
+    }
+
+    void OnCycleUp()
+    {
+        Destroy(currentMannequin);
+        if (mannequinIndex < mannequins.Length-1)
+        {
+            mannequinIndex++;
+        }
+        else
+        {
+            mannequinIndex = 0;
+        }
+        currentMannequin = Instantiate(mannequins[mannequinIndex], transform);
+        mannequin = currentMannequin.GetComponent<Mannequin>();
+        mannequin.builderController = this;
+        mannequin.SetLeftWeapon(lselection);
+        mannequin.SetRightWeapon(rselection);
+    }
+
+    public struct BuildData
+    {
+        public C_Weapon leftWeapon;
+        public C_Weapon rightWeapon;
+        public int hero;
+        public InputDevice device;
+    }
+
 }
